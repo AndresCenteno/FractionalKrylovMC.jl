@@ -44,7 +44,7 @@ with $T^\beta_t\sim p_\beta(t,r)$ a non-negative random variable called $\alpha$
         - You obtain weights by sampling, so: Monte-Carlo.
 
 First option means numerically evaluating this integral
-$$\int_0^\infty \int_0^\intfy dr\,d\tau\; \exp(-r^{1/\gamma}\tau A^n)K_\alpha(r,t^\alpha)p_\beta(\tau)$$
+$$\int_0^\infty \int_0^\infty dr d\tau \exp(-r^{1/\gamma}\tau A^n)K_\alpha(r,t^\alpha)p_\beta(\tau)$$
 where $n$ is the smallest integer such that $\beta/(\alpha n)<1=\gamma$. Second option is just taking the expected value
 $$\mathbb{E}_t (\exp(-At))$$ where $t$ follows a weird RNG. This little idea is what makes this worth of publishing.
 
