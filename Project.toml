@@ -5,6 +5,7 @@ version = "1.0.0-DEV"
 
 [deps]
 AlphaStableDistributions = "f20549b4-2d50-407f-863c-cdd202ba59a3"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 ExponentialUtilities = "d4d017d3-3776-5f7e-afef-a10c40355c18"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MittagLeffler = "9c257583-4f8f-53fd-abd9-c69d5080dd54"

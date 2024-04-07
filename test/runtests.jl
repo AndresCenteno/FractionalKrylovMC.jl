@@ -1,5 +1,8 @@
 using FractionalKrylovMC
 using Test
+# do not want to export this from FractionalKrylovMC within that namespace
+using LinearAlgebra: cholesky
+using Distributions: FDist
 
 @testset "FractionalKrylovMC.jl" begin
     # Write your tests here.
@@ -17,10 +20,21 @@ end
     if we pass the tests for
     """
     p = 0.05
-    experiments = Int(1e2)
-    samples_per_experiment = Int(1e6)
+    k = 30
+    experiments = Int(3e2)
+    samples_per_experiment = Int(1e5); n = samples_per_experiment
     test_passed = 0
+    confidence_interval = quantile(FDist(k,n),1-p)*k*(n-1)/(n-k)
     for _ in 1:experiments
-        Σ = rand()
+        # mean μ does not matter at all here
+        Σ = rand(k,k); Σ = Σ*Σ'
+        σ = cholesky(Σ).L
+        samples = σ*randn(k,n)
+        X = mean(samples,dims=2)
+        Σsampled = cov(samples,dims=2) # = (samples .- X)*(samples .- X)'/(n-1)
+        hotelling_sample = n*X'*(Σsampled\X)
+        test_passed += hotelling_sample[1] <= confidence_interval
     end
+    @show test_passed, experiments
+    @test test_passed >= 0.95*experiments
 end 
