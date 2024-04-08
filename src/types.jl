@@ -9,11 +9,14 @@ struct MittagLefflerProblem{T}
     t::T
     α::T # exponent in time
     #TODO
-    # find if the spectral Kernel for β≠1 is a pdf
+    # find if the spectral Kernel for β≠1 is a pdf, postponed indefinetly
     # β::T
     γ::T # exponent in space
     μ::T
     nμ::Int
+    #TODO
+    # include Krylov decomposition
+    
     function MittagLefflerProblem(A::Matrix{T},u0::Vector{T},t::T,α::T,γ::T) where T<:Real
         N = length(u0)
         if size(A,1) != size(A,2)
@@ -39,7 +42,7 @@ struct MittagLefflerMCSolution{T} <: MittagLefflerSolution
     nsims::Int
     cutoff::T
     # to update to store Σ and checks
-    function MittagLefflerMCSolution(uT::Vector{T},times::Vector{T},
+    function MittagLefflerMCSolution(uT::Union{Vector{T},Matrix{T}},times::Vector{T},
                                     nsims::Int,cutoff::T) where T<:Real
         new{T}(uT,times,nsims,cutoff)
     end

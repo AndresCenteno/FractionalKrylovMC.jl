@@ -3,15 +3,25 @@ using Test
 # do not want to export this from FractionalKrylovMC within that namespace
 using LinearAlgebra: cholesky
 using Distributions: FDist
+using Statistics
 
+# this test does not pass because of covariancee matrix not being invertible
 @testset "FractionalKrylovMC.jl" begin
-    # Write your tests here.
-    N = 20
-    A = rand(N,N); A = A*A';
-    α = 0.9; γ = 0.8
-    t = 2.
-    u0 = randn(N)
-    problem = MittagLefflerProblem(A,u0,t,α,γ)
+    p = 0.1
+    k = 20
+    experiments = Int(25)
+    nsims = Int(1e6)
+    cutoff = 1e7
+    test_passed = 0
+    for _ in 1:experiments
+        # generate random parameters
+        problem = create_random_problem(k)
+        MCSol = solve(problem,nsims,cutoff,MCSolverSaveSamples())
+        EigenSol = solve(problem,EigenSolver())
+        test_passed += within_region(MCSol,EigenSol,p)
+    end
+    @show test_passed, experiments
+    @test test_passed >= (1-p)*experiments
 end
 
 @testset "ConfidenceIntervals" begin
@@ -24,7 +34,7 @@ end
     experiments = Int(3e2)
     samples_per_experiment = Int(1e5); n = samples_per_experiment
     test_passed = 0
-    confidence_interval = quantile(FDist(k,n),1-p)*k*(n-1)/(n-k)
+    confidence_interval = quantile(FDist(k,nsims),1-p)*k*(nsims-1)/(nsims-k)
     for _ in 1:experiments
         # mean μ does not matter at all here
         Σ = rand(k,k); Σ = Σ*Σ'
@@ -38,3 +48,11 @@ end
     @show test_passed, experiments
     @test test_passed >= 0.95*experiments
 end 
+
+# @testset "IntegralFormulas" begin
+#     """
+#     I pretend to test the case γ > α
+#     """
+#     γ = 0.8; α = 0.3
+    
+# end

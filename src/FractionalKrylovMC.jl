@@ -18,8 +18,13 @@ export MittagLefflerMCSolution
 # solving
 export solve
 export MCSolver
+export MCSolverSaveSamples
+export EigenSolver
 
 # utils
+export SpectralKernel
 export generate_times
+export within_region
+export create_random_problem
 
 end
