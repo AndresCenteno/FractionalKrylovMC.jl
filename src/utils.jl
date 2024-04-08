@@ -40,10 +40,10 @@ function within_region(MCSol::MittagLefflerMCSolution,
 end
 
 function create_random_problem(α::T,γ::T,k::Int) where T<:Real
-    A = rand(k,k); A = A*A';
+    A = rand(k,k); Q = Matrix(qr(A).Q); Λ = rand(k)
     t = rand()*2
-    u0 = randn(k)
-    problem = MittagLefflerProblem(A,u0,t,α,γ)
+    u0 = rand(k)
+    problem = MittagLefflerProblem(Λ,Q,u0,t,α,γ)
     problem
 end
 

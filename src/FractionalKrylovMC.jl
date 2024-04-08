@@ -3,7 +3,7 @@ module FractionalKrylovMC
 # Write your package code here.
 using LinearAlgebra
 using AlphaStableDistributions, Distributions, Statistics
-using ExponentialUtilities, MittagLeffler
+using Expokit, MittagLeffler
 
 include("types.jl")
 include("utils.jl")
@@ -19,6 +19,7 @@ export MittagLefflerMCSolution
 export solve
 export MCSolver
 export MCSolverSaveSamples
+export MCSolverExpokit
 export EigenSolver
 
 # utils
