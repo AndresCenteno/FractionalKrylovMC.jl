@@ -1,14 +1,21 @@
+
 """
 Spectral kernel for the Mittag-Leffler function
 """
 SpectralKernel(α,λ,r) = (λ*r^(α-1)*sin(α*π)) / (pi*(r^(2α)+2*λ*r^α*cos(α*π)+λ^2))
-
+"""
+Random Number Generator for the spectral kernel above
+"""
+SpectralKernelRNG(u) = abs(tan((α*pi)*u + atan(1/tan(pi*α)))*λ*sin(pi*α)-λ*cos(pi*α))^(1/α)
+"""
+Random Number Generator for the Levy subordinator with α∈(0,1) strict
+"""
+#TODO
 """
 Generate ordered times for the quadrature of the Fractional Mittag-Leffler
 """
 function generate_times(problem::MittagLefflerProblem{T},nsims::Int) where T<:Real
     λ, α, μ = problem.t^problem.α, problem.α, problem.μ
-    SpectralKernelRNG(u) = abs(tan((α*pi)*u + atan(1/tan(pi*α)))*λ*sin(pi*α)-λ*cos(pi*α))^(1/α)
     LevySubordinator = AlphaStable(μ,1,cos(μ*pi/2)^(1/μ),0)
     times = SpectralKernelRNG.(rand(nsims)).^(1/μ).*rand(LevySubordinator,nsims)
     sort(filter(!isnan,times))
@@ -53,3 +60,5 @@ create_random_problem(k::Int) = create_random_problem(0.1 + 0.9*rand(),0.1 + 0.9
 #TODO:
 # Create struct called synthetic solution in which we have a positive semidefinite
 # matrix created by ourselves and the orthogonal eigendecomposition is stored
+
+relative_error(true_val,est_val) = norm(est_val-true_val)/norm(true_val)

@@ -6,10 +6,15 @@ version = "1.0.0-DEV"
 [deps]
 AlphaStableDistributions = "f20549b4-2d50-407f-863c-cdd202ba59a3"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-Expokit = "a1e7a1ef-7a5d-5822-a38c-be74e1bb89f4"
+DistributionsAD = "ced4e74d-a319-5a8a-b0ac-84af2272839c"
+ExponentialAction = "e24c0720-ea99-47e8-929e-571b494574d3"
 ExponentialUtilities = "d4d017d3-3776-5f7e-afef-a10c40355c18"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+Functors = "d9f16b24-f501-4c13-a1f2-28368ffc5196"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MittagLeffler = "9c257583-4f8f-53fd-abd9-c69d5080dd54"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
