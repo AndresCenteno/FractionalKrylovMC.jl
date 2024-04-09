@@ -1,7 +1,7 @@
-struct EigenSolver <: MittagLefflerSolver end
+struct EigenSolver <: MatVecSolver end
 
 function solve(problem::MittagLefflerProblem{T}, ::EigenSolver
-    )::MittagLefflerEigenSolution where T<:Real
+    )::MatVecSolution where T<:Real
     Λ, Χ = eigen(problem.A)
     α, γ = problem.α, problem.γ
     modified_spectrum = mittleff.(α,-Λ.^γ*problem.t^α)

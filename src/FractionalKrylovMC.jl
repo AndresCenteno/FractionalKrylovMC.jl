@@ -9,11 +9,9 @@ include("types.jl")
 include("utils.jl")
 include("solvers/MC.jl"); include("solvers/eigendecomposition.jl")
 
-export MittagLefflerProblem
+export MittagLefflerProblem, FracExpProblem, MittagLefflerRand, FracExpRand
 # abstract types to support different kinds of solutions
-export MittagLefflerSolver
-export MittagLefflerSolution
-export MittagLefflerMCSolution
+export MatVecSolver, MatVecSolution
 
 # solving
 export solve
@@ -27,5 +25,6 @@ export SpectralKernel
 export generate_times
 export within_region
 export create_random_problem
+export relative_error
 
 end

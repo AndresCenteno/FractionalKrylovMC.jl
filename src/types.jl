@@ -1,5 +1,10 @@
-abstract type MittagLefflerSolver end
-abstract type MittagLefflerSolution end
+abstract type MatVecSolver end
+abstract type MatVecSolution end
+#TODO: perhaps merge MittagLeffler and just FracExp into one type
+
+################################
+### MITTAG-LEFFLER + FRAC ######
+################################
 
 struct MittagLefflerProblem{T}
     N::Int # size of matrix
@@ -20,7 +25,7 @@ struct MittagLefflerProblem{T}
     # and include spectral decomposition why not
     λs::Vector{T}
     xs::Matrix{T}
-    spectral_uT::Vector{T}
+    uT_spectral::Vector{T}
 
     function MittagLefflerProblem(A::Matrix{T},u0::Vector{T},t::T,α::T,γ::T) where T<:Real
         N = length(u0)
@@ -61,7 +66,7 @@ struct MittagLefflerProblem{T}
     end
 end
 
-struct MittagLefflerMCSolution{T} <: MittagLefflerSolution 
+struct MittagLefflerMCSolution{T} <: MatVecSolution 
     uT::Union{Vector{T},Matrix{T}} # 
     times::Vector{T}
     nsims::Int
@@ -73,7 +78,52 @@ struct MittagLefflerMCSolution{T} <: MittagLefflerSolution
     end
 end
 
-struct MittagLefflerEigenSolution{T} <: MittagLefflerSolution
+struct MittagLefflerEigenSolution{T} <: MatVecSolution
     uT::Vector{T}
     # can we have an estimate of error?
+end
+
+####################
+## EXP + FRAC ######
+####################
+
+struct FracExpProblem{T}
+    N::Int
+    A::Matrix{T}
+    u0::Vector{T}
+    t::T
+    γ::T
+    # for exact solution
+    Aγ::Matrix{T}
+    λs::Vector{T}
+    xs::Matrix{T}
+    uT_spectral::Vector{T}
+    # constructors
+    # without spectral decomposition
+    function FracExpProblem(A::Matrix{T},u0::Vector{T},t::T,γ::T) where T<:Real
+        N = length(u0)
+        (γ < 0.1 || γ >= 1) && throw(DomainError(γ,"Fractional exponent must be between 0.1 and 1"))
+        new{T}(N,A,u0,t,γ,nothing,nothing,nothing,nothing)
+    end
+    # with spectral decomposition
+    function FracExpProblem(λs::Vector{T},xs::Matrix{T},u0::Vector{T},t::T,γ::T) where T<:Real
+        N = length(u0)
+        A = xs*diagm(λs)/xs
+        (γ < 0.1 || γ >= 1) && throw(DomainError(γ,"Fractional exponent must be between 0.1 and 1"))
+        Aγ = xs*diagm(λs.^γ)/xs
+        uT_spectral = xs*diagm(exp.(-t*λs.^γ))*(xs\u0)
+        new{T}(N,A,u0,t,γ,Aγ,λs,xs,uT_spectral)
+    end
+end
+
+struct FracExpMCSolution{T} <: MatVecSolution 
+    uT::Union{Vector{T},Matrix{T}} # 
+    times::Vector{T}
+    nsims::Int
+    cutoff::T
+    # to update to store Σ and checks
+    function FracExpMCSolution(uT::Union{Vector{T},Matrix{T}},times::Vector{T},
+                                    nsims::Int,cutoff::T) where T<:Real
+        new{T}(uT,times,nsims,cutoff)
+    end
 end

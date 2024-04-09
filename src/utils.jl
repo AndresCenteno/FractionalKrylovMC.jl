@@ -3,21 +3,23 @@
 Spectral kernel for the Mittag-Leffler function
 """
 SpectralKernel(α,λ,r) = (λ*r^(α-1)*sin(α*π)) / (pi*(r^(2α)+2*λ*r^α*cos(α*π)+λ^2))
-"""
-Random Number Generator for the spectral kernel above
-"""
-SpectralKernelRNG(u) = abs(tan((α*pi)*u + atan(1/tan(pi*α)))*λ*sin(pi*α)-λ*cos(pi*α))^(1/α)
-"""
-Random Number Generator for the Levy subordinator with α∈(0,1) strict
-"""
-#TODO
+
 """
 Generate ordered times for the quadrature of the Fractional Mittag-Leffler
+and for the quadrature of the Fractional Exponential
 """
 function generate_times(problem::MittagLefflerProblem{T},nsims::Int) where T<:Real
     λ, α, μ = problem.t^problem.α, problem.α, problem.μ
     LevySubordinator = AlphaStable(μ,1,cos(μ*pi/2)^(1/μ),0)
+    SpectralKernelRNG(u) = abs(tan((α*pi)*u + atan(1/tan(pi*α)))*λ*sin(pi*α)-λ*cos(pi*α))^(1/α)
     times = SpectralKernelRNG.(rand(nsims)).^(1/μ).*rand(LevySubordinator,nsims)
+    sort(filter(!isnan,times))
+end
+
+function generate_times(problem::FracExpProblem{T},nsims::Int) where T<:Real
+    t, γ = problem.t, problem.γ
+    LevySubordinator = AlphaStable(γ,1,cos(γ*pi/2)^(1/γ),0)
+    times = t^(1/γ).*rand(LevySubordinator,nsims)
     sort(filter(!isnan,times))
 end
 
@@ -46,7 +48,10 @@ function within_region(MCSol::MittagLefflerMCSolution,
     return hotelling_sample[1] < confidence_interval
 end
 
-function create_random_problem(α::T,γ::T,k::Int) where T<:Real
+struct MittagLefflerRand end
+struct FracExpRand end
+
+function create_random_problem(α::T,γ::T,k::Int,::MittagLefflerRand) where T<:Real
     A = rand(k,k); Q = Matrix(qr(A).Q); Λ = rand(k)
     t = rand()*2
     u0 = rand(k)
@@ -54,7 +59,15 @@ function create_random_problem(α::T,γ::T,k::Int) where T<:Real
     problem
 end
 
-create_random_problem(k::Int) = create_random_problem(0.1 + 0.9*rand(),0.1 + 0.9*rand(),k::Int)
+function create_random_problem(γ::T,k::Int,::FracExpRand) where T<:Real
+    A = rand(k,k); Q = Matrix(qr(A).Q); Λ = rand(k)
+    t = rand()*2
+    u0 = rand(k)
+    problem = FracExpProblem(Λ,Q,u0,t,γ)
+    problem
+end
+
+create_random_problem(k::Int,::T) = create_random_problem(0.1 + 0.9*rand(),0.1 + 0.9*rand(),k::Int,::T) where T<:Union{MittagLefflerRand,FracExpRand}
 
 
 #TODO:
