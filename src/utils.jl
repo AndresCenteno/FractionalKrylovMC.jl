@@ -5,6 +5,18 @@ Spectral kernel for the Mittag-Leffler function
 SpectralKernel(α,λ,r) = (λ*r^(α-1)*sin(α*π)) / (pi*(r^(2α)+2*λ*r^α*cos(α*π)+λ^2))
 
 """
+RNG for γ-stable subordinator
+"""
+function γStableRNG(U::T,V::T,γ::T,t::T) where T<:Real
+    α = γ
+    """
+    Computer Simulation of L6vy cz-Stable Variables and Processes
+    Aleksander Weron * and Rafat Weron
+    """
+    S_α = (1 + tam)
+end
+
+"""
 Generate ordered times for the quadrature of the Fractional Mittag-Leffler
 and for the quadrature of the Fractional Exponential
 """
@@ -16,14 +28,16 @@ function generate_times(problem::MittagLefflerProblem{T},nsims::Int) where T<:Re
     sort(filter(!isnan,times))
 end
 
-function generate_times(problem::FracExpProblem{T},nsims::Int) where T<:Real
+function generate_times(problem::FracExpProblem{T},nsims::Int;gradient=false) where T<:Real
     t, γ = problem.t, problem.γ
-    LevySubordinator = AlphaStable(γ,1,cos(γ*pi/2)^(1/γ),0)
-    times = t^(1/γ).*rand(LevySubordinator,nsims)
-    sort(filter(!isnan,times))
+    if gradient == false
+        LevySubordinator = AlphaStable(γ,1,cos(γ*pi/2)^(1/γ),0)
+        times = t^(1/γ).*rand(LevySubordinator,nsims)
+        return sort(filter(!isnan,times))
+    end
+    Ustream, Vstream = rand(nsims), rand(nsims)
+    
 end
-
-generate_times(problem::MittagLefflerProblem,nsims::Int) = generate_times(problem::MittagLefflerProblem{T},nsims::Int) where T<:Real
 
 """
 #TODO: why should the error follow the CLT? Well, if we take the mean, it actually should no?
@@ -66,8 +80,6 @@ function create_random_problem(γ::T,k::Int,::FracExpRand) where T<:Real
     problem = FracExpProblem(Λ,Q,u0,t,γ)
     problem
 end
-
-create_random_problem(k::Int,::T) = create_random_problem(0.1 + 0.9*rand(),0.1 + 0.9*rand(),k::Int,::T) where T<:Union{MittagLefflerRand,FracExpRand}
 
 
 #TODO:

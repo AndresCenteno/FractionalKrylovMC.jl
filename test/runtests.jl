@@ -3,6 +3,7 @@ using Test
 # do not want to export this from FractionalKrylovMC within that namespace
 using LinearAlgebra: cholesky
 using Distributions: FDist
+using AlphaStableDistributions
 using Statistics
 
 # this test does not pass because of covariancee matrix not being invertible
@@ -32,6 +33,7 @@ end
     p = 0.05
     k = 30
     experiments = Int(3e2)
+    λtγ = λ*t^(1/γ)
     samples_per_experiment = Int(1e5); n = samples_per_experiment
     test_passed = 0
     confidence_interval = quantile(FDist(k,nsims),1-p)*k*(nsims-1)/(nsims-k)
@@ -49,10 +51,27 @@ end
     @test test_passed >= 0.95*experiments
 end 
 
-# @testset "IntegralFormulas" begin
-#     """
-#     I pretend to test the case γ > α
-#     """
-#     γ = 0.8; α = 0.3
-    
-# end
+# no puede ser que la formula integral no me funcione madre mia
+@testset "IntegralFormulas" begin
+    """
+    Checking in 1D whether exp(-t*λ^γ) = exp(-(t^(1/γ)*λ)^γ)=∫_0^∞ exp(-t^(1/γ)*λ*τ)p(γ,τ)dτ
+    using the CLT
+    """
+    test_passed = 0
+    experiments = Int(1e3)
+    nsims = Int(1e4)
+    for _ in 1:experiments
+        λ = rand()*2
+        t = rand()
+        γ = 0.1 + rand()*0.9
+        λtγ = λ*t^(1/γ)
+        τ = AlphaStable(γ,1,cos(γ*pi/2)^(1/γ),0)
+        samples = zeros(nsims)
+        for sim in 1:nsims
+            samples[sim] = exp(-λtγ*rand(τ))
+        end
+        test_passed += abs(exp(-λ*t^γ)-mean(samples)) <= std(samples)*1.96/sqrt(nsims)
+    end
+    @show test_passed, experiments
+    @test test_passed >= 0.93*experiments
+end

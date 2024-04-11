@@ -22,3 +22,5 @@ KrySubspaceDim = 5
 MCKrySol = solve(problem,nsims,cutoff,KrySubspaceDim,MCSolverExpokit())
 
 relative_error(problem.uT_spectral,MCKrySol.uT)
+
+#TODO: convergence of error

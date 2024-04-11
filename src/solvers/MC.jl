@@ -14,16 +14,20 @@ function solve(problem::MittagLefflerProblem{T},nsims::Int,
 end
 
 function solve(problem::FracExpProblem{T},nsims::Int,
-    cutoff::T,::MCSolver)::MatVecSolution where T<:Real
+    cutoff::T,::MCSolver;gradient=false)::MatVecSolution where T<:Real
     uT = zeros(problem.N)
-    times = filter(x->x<=cutoff,generate_times(problem,nsims)) # times for quadrature
-    jumps = [times[1];times[2:end]-times[1:end-1]]
-    v = copy(problem.u0)
-    for i in eachindex(jumps)
-        v = exp(-problem.A*jumps[i])*v
-        uT += v/nsims # times beyond cutoff are considered steady state 0
+    if gradient == false
+        times = filter(x->x<=cutoff,generate_times(problem,nsims,gradient=false)) # times for quadrature
+        jumps = [times[1];times[2:end]-times[1:end-1]]
+        v = copy(problem.u0)
+        for i in eachindex(jumps)
+            v = exp(-problem.A*jumps[i])*v
+            uT += v/nsims # times beyond cutoff are considered steady state 0
+        end
+        return FracExpMCSolution(uT,times,nsims,cutoff)
+    else
+
     end
-    FracExpMCSolution(uT,times,nsims,cutoff)
 end
 
 struct MCSolverSaveSamples <: MatVecSolver end

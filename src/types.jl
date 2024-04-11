@@ -98,12 +98,13 @@ struct FracExpProblem{T}
     λs::Vector{T}
     xs::Matrix{T}
     uT_spectral::Vector{T}
+    duTdγ_spectral::Vector{T}
     # constructors
     # without spectral decomposition
     function FracExpProblem(A::Matrix{T},u0::Vector{T},t::T,γ::T) where T<:Real
         N = length(u0)
         (γ < 0.1 || γ >= 1) && throw(DomainError(γ,"Fractional exponent must be between 0.1 and 1"))
-        new{T}(N,A,u0,t,γ,nothing,nothing,nothing,nothing)
+        new{T}(N,A,u0,t,γ,nothing,nothing,nothing,nothing,nothing)
     end
     # with spectral decomposition
     function FracExpProblem(λs::Vector{T},xs::Matrix{T},u0::Vector{T},t::T,γ::T) where T<:Real
@@ -112,18 +113,24 @@ struct FracExpProblem{T}
         (γ < 0.1 || γ >= 1) && throw(DomainError(γ,"Fractional exponent must be between 0.1 and 1"))
         Aγ = xs*diagm(λs.^γ)/xs
         uT_spectral = xs*diagm(exp.(-t*λs.^γ))*(xs\u0)
-        new{T}(N,A,u0,t,γ,Aγ,λs,xs,uT_spectral)
+        duTdγ_spectral = xs*diagm(-t*log.(λs).*λs.^γ.*exp.(-t*λs.^γ))*(xs\u0)
+        new{T}(N,A,u0,t,γ,Aγ,λs,xs,uT_spectral,duTdγ_spectral)
     end
 end
 
 struct FracExpMCSolution{T} <: MatVecSolution 
-    uT::Union{Vector{T},Matrix{T}} # 
+    uT::Union{Vector{T},Matrix{T}}
+    duTdγ::Vector{T}
     times::Vector{T}
     nsims::Int
     cutoff::T
     # to update to store Σ and checks
     function FracExpMCSolution(uT::Union{Vector{T},Matrix{T}},times::Vector{T},
                                     nsims::Int,cutoff::T) where T<:Real
-        new{T}(uT,times,nsims,cutoff)
+        new{T}(uT,nothing,times,nsims,cutoff)
+    end
+    function FracExpMCSolution(uT::Union{Vector{T},Matrix{T}},duTdγ::Vector{T},times::Vector{T},
+                                    nsims::Int,cutoff::T) where T<:Real
+        new{T}(uT,duTdγ,times,nsims,cutoff)
     end
 end
