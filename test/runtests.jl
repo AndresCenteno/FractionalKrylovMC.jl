@@ -1,9 +1,8 @@
 using FractionalKrylovMC
 using Test
 # do not want to export this from FractionalKrylovMC within that namespace
-using LinearAlgebra: cholesky
-using Distributions: FDist
-using AlphaStableDistributions
+using LinearAlgebra: cholesky, qr, diagm
+# using Distributions: FDist
 using Statistics
 
 # this test does not pass because of covariancee matrix not being invertible
@@ -57,21 +56,47 @@ end
     Checking in 1D whether exp(-t*λ^γ) = exp(-(t^(1/γ)*λ)^γ)=∫_0^∞ exp(-t^(1/γ)*λ*τ)p(γ,τ)dτ
     using the CLT
     """
-    test_passed = 0
-    experiments = Int(1e3)
-    nsims = Int(1e4)
-    for _ in 1:experiments
-        λ = rand()*2
-        t = rand()
-        γ = 0.1 + rand()*0.9
-        λtγ = λ*t^(1/γ)
-        τ = AlphaStable(γ,1,cos(γ*pi/2)^(1/γ),0)
-        samples = zeros(nsims)
-        for sim in 1:nsims
-            samples[sim] = exp(-λtγ*rand(τ))
-        end
-        test_passed += abs(exp(-λ*t^γ)-mean(samples)) <= std(samples)*1.96/sqrt(nsims)
+    # test_passed = 0;
+    # tests = 300;
+    # nsims = Int(1e5);
+    # error_vec = zeros(tests,1);
+    # for test = 1:tests
+    #     alpha = rand()*0.9 + 0.1;
+    #     skewness = cos(alpha*pi/2)^(1/alpha);
+    #     samples = zeros(nsims,1);
+    #     lambda = rand(); t = rand();
+    #     lambdatalpha = t^(1/alpha)*lambda;
+    #     for sim = 1:nsims
+    #         tau = stblsubrnd(alpha);
+    #         samples[sim] = exp(-tau*lambdatalpha);
+    #     end
+    #     error_vec[test] = abs(mean(samples)-exp.(-t*lambda^alpha))/abs(exp.(-t*lambda^alpha));
+    #     boolean = abs(mean(samples)-exp.(-t*lambda^alpha))<= 1.96*std(samples)/sqrt(nsims);
+    #     test_passed = test_passed + boolean;
+    # end
+    # @test test_passed >= 0.94*tests
+    """
+    Testing same as above but for one matrix
+    """
+    k = 20; γ = 0.1 + rand()*0.9
+    λs = rand(k); A = rand(k,k); xs = Matrix(qr(A).Q); u0 = rand(k);
+    reconstructedM = xs*diagm(λs)*xs'
+    uT_spectral = xs*diagm(-λs.^γ)*xs'*u0
+    uT_sims = zeros(k); nsims = Int(1e6)
+    random_times = stblrndsub(γ,nsims)
+    sort(filter())
+    for sim=1:nsims
+        uT_sims += exp(-reconstructedM*random_times[sim])*u0/nsims
     end
-    @show test_passed, experiments
-    @test test_passed >= 0.93*experiments
+    @test isapprox(uT_sims, uT_spectral; rtol = 1e-2)
+end
+
+@testset "Type stability" begin
+    """
+    Testing small stuff about the stblsubrnd
+    """
+    alpha = BigFloat(rand()*0.9 + 0.1)
+    @test stblsubrnd(alpha) isa BigFloat
+    @test stblsubrnd(alpha,2) isa Vector{BigFloat}
+    @test stblsubrnd(Float64(alpha),rand(Float64,3),rand(Float64,3)) isa Vector{Float64}
 end

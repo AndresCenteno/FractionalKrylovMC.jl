@@ -7,6 +7,7 @@ using Expokit, MittagLeffler
 
 include("types.jl")
 include("utils.jl")
+include("random_utils.jl")
 include("solvers/MC.jl"); include("solvers/eigendecomposition.jl")
 
 export MittagLefflerProblem, FracExpProblem, MittagLefflerRand, FracExpRand
@@ -26,5 +27,9 @@ export generate_times
 export within_region
 export create_random_problem
 export relative_error
+
+# random utils
+export stblrnd
+export stblrndsub
 
 end
