@@ -1,7 +1,8 @@
 using FractionalKrylovMC, Plots, Statistics
 
-trajectories = 20
-nsimvec = Int.([2^i for i in 14:21]); experiments = length(nsimvec)
+trajectories = 5
+nsimvec = Int.([2^i for i in 10:21]);
+experiments = length(nsimvec)
 k = 25 # size of matrices
 cutoff = 1e8
 err_to_plot = zeros(experiments,trajectories)
@@ -18,7 +19,7 @@ end
 
 err_to_plot
 plot(log.(nsimvec),log.(mean(err_to_plot,dims=2)),title="$(trajectories) trajectories",xlabel="Log sim",ylabel="Mean log relative err")
-savefig("test/figs/moresim_lesserr_plot5.png")
+savefig("test/figs2/moresim_lesserr_plot2.png")
 
 
 
