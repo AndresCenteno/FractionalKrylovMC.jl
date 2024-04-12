@@ -3,6 +3,7 @@
 Spectral kernel for the Mittag-Leffler function
 """
 SpectralKernel(α,λ,r) = (λ*r^(α-1)*sin(α*π)) / (pi*(r^(2α)+2*λ*r^α*cos(α*π)+λ^2))
+SpectralKernelRNG(α,λ,u) = abs(tan((α*pi)*u + atan(1/tan(pi*α)))*λ*sin(pi*α)-λ*cos(pi*α))^(1/α)
 
 """
 Generate ordered times for the quadrature of the Fractional Mittag-Leffler

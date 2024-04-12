@@ -21,8 +21,8 @@ export MCSolverSaveSamples
 export MCSolverExpokit
 export EigenSolver
 
-# utils
-export SpectralKernel
+# utils 
+export SpectralKernel, SpectralKernelRNG
 export generate_times
 export within_region
 export create_random_problem
