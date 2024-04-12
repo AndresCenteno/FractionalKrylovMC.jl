@@ -21,13 +21,14 @@ export solve
 export MCSolver
 export MCSolverSaveSamples
 export MCSolverExpokit
-export QuadSolver
+export QuadSolver, QuadKrySolver
 export EigenSolver
 
 # utils 
 export SpectralKernel, SpectralKernelRNG
 export generate_times
-export within_region
+# export within_region # it doesn't make any sense to explore convergence of CLT when we can just
+# integrate deterministically over the RNG stream
 export create_random_problem
 export relative_error
 
