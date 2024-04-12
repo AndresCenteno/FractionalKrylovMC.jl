@@ -71,4 +71,12 @@ end
 # Create struct called synthetic solution in which we have a positive semidefinite
 # matrix created by ourselves and the orthogonal eigendecomposition is stored
 
-relative_error(true_val,est_val) = norm(est_val-true_val)/norm(true_val)
+function relative_error(true_solution::MittagLefflerSolution{T},quad_solution::MittagLefflerSolution{T}) where T<:Real
+    sol_err = zeros(3)
+    sol_err[1] = relative_error(true_solution.uT,quad_solution.uT)
+    sol_err[2] = relative_error(true_solution.duTdα,quad_solution.duTdα)
+    sol_err[3] = relative_error(true_solution.duTdγ,quad_solution.duTdγ)
+    sol_err
+end
+
+relative_error(true_val::T,est_val::T) where T<:Union{AbstractVecOrMat,Number} = norm(est_val-true_val)/norm(true_val)

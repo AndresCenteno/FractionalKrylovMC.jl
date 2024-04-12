@@ -1,3 +1,8 @@
+"""
+This is not really that useful hehe to be honest, we are realisticly never gonna
+call this program
+"""
+
 struct EigenSolver <: MatVecSolver end
 
 function solve(problem::MittagLefflerProblem{T}, ::EigenSolver

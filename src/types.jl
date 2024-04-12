@@ -6,6 +6,19 @@ abstract type MatVecSolution end
 ### MITTAG-LEFFLER + FRAC ######
 ################################
 
+"""
+MittagLefflerSolution stores solution u(t) = E_α(-t^α*A^γ)*u0
+and du(t)/dα, du(t)/dγ in a structure for convenience
+"""
+struct MittagLefflerSolution{T} <: MatVecSolution
+    uT::Vector{T}
+    duTdα::Vector{T}
+    duTdγ::Vector{T}
+    function MittagLefflerSolution(uT::Vector{T},duTdα::Vector{T},duTdγ::Vector{T}) where T<:Real
+        new{T}(uT,duTdα,duTdγ)
+    end
+end
+
 struct MittagLefflerProblem{T}
     N::Int # size of matrix
     A::Matrix{T}
@@ -25,7 +38,7 @@ struct MittagLefflerProblem{T}
     # and include spectral decomposition why not
     λs::Vector{T}
     xs::Matrix{T}
-    uT_spectral::Vector{T}
+    solution::MittagLefflerSolution{T}
 
     function MittagLefflerProblem(A::Matrix{T},u0::Vector{T},t::T,α::T,γ::T) where T<:Real
         N = length(u0)
@@ -62,7 +75,10 @@ struct MittagLefflerProblem{T}
         nμ = Int(ceil(γ/α))
         μ = γ/(α*nμ)
         uT_spectral = xs*diagm(mittleff.(α,-λs.^γ*t^α))*(xs\u0)
-        new{T}(N,A,A^nμ,u0,t,α,γ,μ,nμ,λs,xs,uT_spectral)
+        ϵ = sqrt(eps())
+        duTdα_FD = xs*diagm((mittleff.(α+ϵ,-λs.^γ*t^(α+ϵ))-mittleff.(α-ϵ,-λs.^γ*t^(α-ϵ)))/(2*ϵ))*(xs\u0)
+        duTdγ_FD = xs*diagm((mittleff.(α,-λs.^(γ+ϵ)*t^(α))-mittleff.(α,-λs.^(γ-ϵ)*t^(α)))/(2*ϵ))*(xs\u0)
+        new{T}(N,A,A^nμ,u0,t,α,γ,μ,nμ,λs,xs,MittagLefflerSolution(uT_spectral,duTdα_FD,duTdγ_FD))
     end
 end
 
