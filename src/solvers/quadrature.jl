@@ -5,7 +5,7 @@ over [0,1]^3
 
 struct QuadSolver <: MatVecSolver end
 
-function solve(problem::MittagLefflerProblem{T},::QuadSolver,atol::T=1e-5;rtol::T=1e-2) where T<:Real
+function solve(problem::MittagLefflerProblem{T},::QuadSolver;atol=1e-5,rtol=1e-2) where T<:Real
     # unpack parameters
     Anμ = problem.Anμ; n = problem.nμ; γ = problem.γ; α = problem.α; t = problem.t; u0 = problem.u0
     TotalRNG(p,u) = SpectralKernelRNG(p[1],t^p[1],u[1])^(p[1]*n/p[2])*stblrndsub(p[2]/(p[1]*n),u[2],u[3])
@@ -17,7 +17,7 @@ end
 
 struct QuadKrySolver <: MatVecSolver end
 
-function solve(problem::MittagLefflerProblem{T},KryDim::Int,::QuadKrySolver,atol::T=1e-5;rtol::T=1e-2) where T<:Real
+function solve(problem::MittagLefflerProblem{T},KryDim::Int,::QuadKrySolver;atol=1e-5,rtol=1e-2) where T<:Real
     # unpack parameters
     Anμ = problem.Anμ; n = problem.nμ; γ = problem.γ; α = problem.α; t = problem.t; u0 = problem.u0
     TotalRNG(p,u) = SpectralKernelRNG(p[1],t^p[1],u[1])^(p[1]*n/p[2])*stblrndsub(p[2]/(p[1]*n),u[2],u[3])
