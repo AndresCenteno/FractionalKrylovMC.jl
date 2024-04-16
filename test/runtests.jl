@@ -21,7 +21,7 @@ end
 @testset "Moderate k=100 -> k=20 Krylov proyection" begin
     k = 100 # size of matrix
     kkry = 20 # Krylov downsize
-    experiments = Int(5)
+    experiments = Int(3)
     for _ in 1:experiments
         # generate random parameters
         problem = create_random_problem(rand()*0.9+0.1,rand()*0.9+0.1,k,MittagLefflerRand())

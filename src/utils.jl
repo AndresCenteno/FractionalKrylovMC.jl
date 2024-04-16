@@ -60,6 +60,8 @@ end
 
 function create_random_problem(γ::T,k::Int,::FracExpRand) where T<:Real
     A = rand(k,k); Q = Matrix(qr(A).Q); Λ = rand(k)
+    # A = Q*Λ*inv(Q)
+    # f(A) = Q*f(Λ)*inv(Q)
     t = rand()*2
     u0 = rand(k)
     problem = FracExpProblem(Λ,Q,u0,t,γ)
@@ -71,6 +73,8 @@ end
 # Create struct called synthetic solution in which we have a positive semidefinite
 # matrix created by ourselves and the orthogonal eigendecomposition is stored
 
+relative_error(true_val::T,est_val::T) where T<:AbstractVector = norm2(est_val-true_val)/norm2(true_val)
+
 function relative_error(true_solution::MittagLefflerSolution{T},quad_solution::MittagLefflerSolution{T}) where T<:Real
     sol_err = zeros(3)
     sol_err[1] = relative_error(true_solution.uT,quad_solution.uT)
@@ -78,5 +82,3 @@ function relative_error(true_solution::MittagLefflerSolution{T},quad_solution::M
     sol_err[3] = relative_error(true_solution.duTdγ,quad_solution.duTdγ)
     sol_err
 end
-
-relative_error(true_val::T,est_val::T) where T<:Union{AbstractVecOrMat,Number} = norm(est_val-true_val)/norm(true_val)

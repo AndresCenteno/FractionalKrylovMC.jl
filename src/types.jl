@@ -60,7 +60,7 @@ struct MittagLefflerProblem{T}
 
     function MittagLefflerProblem(λs::Vector{T},xs::Matrix{T},u0::Vector{T},t::T,α::T,γ::T) where T<:Real
         N = length(u0)
-        A = xs*diagm(λs)*inv(xs)
+        A = xs*diagm(λs)*inv(xs) # ill posed xs*diagm(λs)/xs
         if size(A,1) != size(A,2)
             error("Matrix provided must be squared")
         elseif α > 1 || α < 0

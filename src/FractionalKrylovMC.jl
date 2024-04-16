@@ -12,7 +12,7 @@ include("utils.jl")
 include("random_utils.jl")
 include("solvers/MC.jl"); include("solvers/eigendecomposition.jl"); include("solvers/quadrature.jl")
 
-export MittagLefflerProblem, FracExpProblem, MittagLefflerRand, FracExpRand
+export MittagLefflerProblem, FracExpProblem, MittagLefflerRand, FracExpRand, MittagLefflerSolution
 # abstract types to support different kinds of solutions
 export MatVecSolver, MatVecSolution
 
@@ -35,5 +35,6 @@ export relative_error
 # random utils
 export stblrnd
 export stblrndsub
+export SpectralKernelRNG, SpectralKernel
 
 end
