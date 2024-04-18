@@ -82,3 +82,40 @@ function relative_error(true_solution::MittagLefflerSolution{T},quad_solution::M
     sol_err[3] = relative_error(true_solution.duTdγ,quad_solution.duTdγ)
     sol_err
 end
+
+#### AVOIDING LAPACK ERRORS
+function exp_psd(t::T,A::Matrix{T};cutoff::T=1e7) where T<:Real
+    if t < cutoff
+        return exp(A*t)
+    end
+    return fill!(similar(A),zero(T))
+end
+
+function expmv_psd(t::T,V::Matrix{T},H::Matrix{T};KryDim::Int,cutoff::T=1e7) where T<:Real
+    if t < cutoff
+        return (V*exp(H*t))[:,1]
+    end
+    return zeros(size(V,1))
+end
+
+function my_arnoldi(A::Matrix{T},KryDim::Int,v::Vector{T}) where T<:Real
+    n = size(A,1);
+    V = zeros(n,KryDim)
+    H = zeros(KryDim,KryDim)
+    
+    V[:,1] = v
+    for k=2:KryDim+1
+        w = A*V[:,k-1]
+        for j=1:k-1
+            b = V[:,j]
+            dotProd = (w'*b)
+            w = w .- dotProd*b
+            H[j,k-1] = dotProd
+        end
+        if k != KryDim + 1
+            H[k,k-1] = norm(w)
+            V[:,k] = w./norm(w)
+        end
+    end
+    return V, H
+end

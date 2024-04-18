@@ -2,6 +2,7 @@ module FractionalKrylovMC
 
 # Write your package code here.
 using LinearAlgebra
+using LinearAlgebra: norm2
 using AlphaStableDistributions, Distributions, Statistics
 using Expokit, MittagLeffler
 using HCubature
