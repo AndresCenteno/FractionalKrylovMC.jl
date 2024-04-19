@@ -20,6 +20,7 @@ struct QuadKrySolver <: MatVecSolver end
 function solve(problem::MittagLefflerProblem{T},KryDim::Int,::QuadKrySolver;atol=1e-5,rtol=1e-2) where T<:Real
     # unpack parameters
     Anμ = problem.Anμ; n = problem.nμ; γ = problem.γ; α = problem.α; t = problem.t; u0 = problem.u0
+    # p is a vector of parameters p = [α;γ]
     TotalRNG(p,u) = SpectralKernelRNG(p[1],t^p[1],u[1])^(p[1]*n/p[2])*stblrndsub(p[2]/(p[1]*n),u[2],u[3])
     dTotalRNGdp(p,u) = ForwardDiff.gradient(p->TotalRNG(p,u),p)
     normu0 = norm(u0); u00 = u0/normu0;
