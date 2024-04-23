@@ -91,11 +91,17 @@ function exp_psd(t::T,A::Matrix{T};cutoff::T=1e7) where T<:Real
     return fill!(similar(A),zero(T))
 end
 
+
 function expmv_psd(t::T,V::Matrix{T},H::Matrix{T};KryDim::Int,cutoff::T=1e7) where T<:Real
     if t < cutoff
         return (V*exp(H*t))[:,1]
     end
     return zeros(size(V,1))
+end
+
+function exp_cutoff(t::T,H::Matrix{T};cutoff::T=1e6) where T<:Real
+    # should avoid allocating zeros(size(H)) by preallocating or doing a better check than this
+    return t < cutoff ? exp(H*t) : zeros(size(H))
 end
 
 function my_arnoldi(A::Matrix{T},KryDim::Int,v::Vector{T}) where T<:Real

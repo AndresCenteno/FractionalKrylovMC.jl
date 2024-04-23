@@ -27,8 +27,14 @@ function solve(problem::MittagLefflerProblem{T},KryDim::Int,::QuadKrySolver;atol
     V, H = my_arnoldi(Anμ,KryDim,u00)
     e1 = zeros(size(H,1)); e1[1] = 1
     uT = hcubature(u->normu0*expmv_psd(TotalRNG([α;γ],u),V,-H,KryDim=KryDim),[0;0;0],[1;1;1],atol=atol,rtol=rtol)[1]
+    uT = normu0*hcubature(u->(V*exp_cutoff(TotalRNG([α;γ],u),-H))[:,1],[0;0;0],[1;1;1],atol=atol,rtol=rtol)[1]
+    duTdp = normu0*hcubature(u->(V*(-H)*exp_cutoff(TotalRNG([α;γ],u),-H))[:,1]*dTotalRNGdp([α;γ],u)',[0;0;0],[1;1;1],atol=atol,rtol=rtol)[1]
+
     # duTdp = (-Anμ)*hcubature(u->normu0*expmv_psd(TotalRNG([α;γ],u),V,-H,KryDim=KryDim)*dTotalRNGdp([α;γ],u)',[0;0;0],[1;1;1],atol=atol,rtol=rtol)[1]
     # duTdp = V*(-H)*V'*hcubature(u->normu0*expmv_psd(TotalRNG([α;γ],u),V,-H,KryDim=KryDim)*dTotalRNGdp([α;γ],u)',[0;0;0],[1;1;1],atol=atol,rtol=rtol)[1]
-    duTdp = hcubature(u->normu0*V*(-H)*exp(-TotalRNG([α;γ],u)*H)*e1*dTotalRNGdp([α;γ],u)',[0;0;0],[1;1;1],atol=atol,rtol=rtol)[1]
+    # duTdp = hcubature(u->normu0*V*(-H)*exp(-TotalRNG([α;γ],u)*H)*e1*dTotalRNGdp([α;γ],u)',[0;0;0],[1;1;1],atol=atol,rtol=rtol)[1]
+    # wtf am I doing here, think
+
+    
     return MittagLefflerSolution(uT,duTdp[:,1],duTdp[:,2])
 end

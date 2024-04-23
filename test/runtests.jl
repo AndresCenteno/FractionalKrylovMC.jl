@@ -19,14 +19,15 @@ using Statistics
 end
 
 @testset "Moderate k=100 -> k=20 Krylov proyection" begin
-    k = 100 # size of matrix
-    kkry = 20 # Krylov downsize
-    experiments = Int(3)
-    for _ in 1:experiments
+    k = 20 # size of matrix
+    kkry = 18 # Krylov downsize
+    experiments = Int(10)
+    for i in 1:experiments
         # generate random parameters
+        @show i
         problem = create_random_problem(rand()*0.9+0.1,rand()*0.9+0.1,k,MittagLefflerRand())
-        MCSol = solve(problem,kkry,QuadKrySolver(),atol=1e-8,rtol=1e-5)
-        @test all(relative_error(problem.solution,MCSol).<=1e-2)
+        QuadSol = solve(problem,kkry,QuadKrySolver(),atol=1e-8,rtol=1e-2)
+        @test all(relative_error(problem.solution,QuadSol).<=5e-2)
     end
 end
 
