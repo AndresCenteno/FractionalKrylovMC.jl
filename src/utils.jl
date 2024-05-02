@@ -125,3 +125,17 @@ function my_arnoldi(A::Matrix{T},KryDim::Int,v::Vector{T}) where T<:Real
     end
     return V, H
 end
+
+function shit_cuadrature_3D(f::Function; Nt = 100)
+    # just to check times
+    Δt = 1/Nt
+    res = similar(f(rand(3))); fill!(res,0)
+    for i=1:Nt
+        for j=1:Nt
+            for k=1:Nt
+                res += f([(i-1)*Δt;(j-1)*Δt;(k-1)*Δt])*Δt^3
+            end
+        end
+    end
+    return res
+end

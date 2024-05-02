@@ -22,7 +22,7 @@ export solve
 export MCSolver
 export MCSolverSaveSamples
 export MCSolverExpokit
-export QuadSolver, QuadKrySolver
+export QuadSolver, QuadKrySolver, ShitSolver
 export EigenSolver
 
 # utils 

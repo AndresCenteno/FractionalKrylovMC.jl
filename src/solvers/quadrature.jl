@@ -38,3 +38,15 @@ function solve(problem::MittagLefflerProblem{T},KryDim::Int,::QuadKrySolver;atol
     
     return MittagLefflerSolution(uT,duTdp[:,1],duTdp[:,2])
 end
+
+struct ShitSolver <: MatVecSolver end
+
+function solve(problem::MittagLefflerProblem{T},::ShitSolver;Nt=100) where T<:Real
+    # unpack parameters
+    Anμ = problem.Anμ; n = problem.nμ; γ = problem.γ; α = problem.α; t = problem.t; u0 = problem.u0
+    TotalRNG(p,u) = SpectralKernelRNG(p[1],t^p[1],u[1])^(p[1]*n/p[2])*stblrndsub(p[2]/(p[1]*n),u[2],u[3])
+    dTotalRNGdp(p,u) = ForwardDiff.gradient(p->TotalRNG(p,u),p)
+    uT = shit_cuadrature_3D(u->exp_psd(TotalRNG([α,γ],u),-Anμ)*u0;Nt=Nt)
+    duTdp = (-Anμ)*shit_cuadrature_3D(u->exp_psd(TotalRNG([α,γ],u),-Anμ)*u0*dTotalRNGdp([α;γ],u)')
+    return MittagLefflerSolution(uT,duTdp[:,1],duTdp[:,2])
+end
