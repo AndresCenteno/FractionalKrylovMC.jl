@@ -51,7 +51,7 @@ struct MittagLefflerRand end
 struct FracExpRand end
 
 function create_random_problem(α::T,γ::T,k::Int,::MittagLefflerRand) where T<:Real
-    A = rand(k,k); Q = Matrix(qr(A).Q); Λ = rand(k)
+    A = rand(k,k); Q = Matrix(qr(A).Q); Λ = 50*rand(k)
     t = rand()*2
     u0 = rand(k)
     problem = MittagLefflerProblem(Λ,Q,u0,t,α,γ)
@@ -59,7 +59,7 @@ function create_random_problem(α::T,γ::T,k::Int,::MittagLefflerRand) where T<:
 end
 
 function create_random_problem(γ::T,k::Int,::FracExpRand) where T<:Real
-    A = rand(k,k); Q = Matrix(qr(A).Q); Λ = rand(k)
+    A = rand(k,k); Q = Matrix(qr(A).Q); Λ = 50*rand(k)
     # A = Q*Λ*inv(Q)
     # f(A) = Q*f(Λ)*inv(Q)
     t = rand()*2
@@ -138,4 +138,25 @@ function shit_cuadrature_3D(f::Function; Nt = 100)
         end
     end
     return res
+end
+
+using SparseArrays, LinearAlgebra, Random
+function rand_orthog_sparse(n::Int,blocks::Int)
+    # size of matrix nxn
+    # with #blocks amount of orthogonal blocks
+    size_blocks = zeros(Int64,blocks)
+    for i in 1:n
+        size_blocks[rand(1:blocks)] += 1
+    end
+    cumsize_blocks = cumsum(size_blocks)
+    rand_sparse = spzeros(n,n)
+    for b = 1:blocks
+        A = randn(size_blocks[b],size_blocks[b]); Q = qr(A).Q
+        if b==1
+            rand_sparse[1:size_blocks[b],1:size_blocks[b]] .= Q
+        else
+            rand_sparse[cumsize_blocks[b-1]+1:cumsize_blocks[b],cumsize_blocks[b-1]+1:cumsize_blocks[b]] .= Q 
+        end
+    end
+    return rand_sparse[randperm(n),randperm(n)]
 end

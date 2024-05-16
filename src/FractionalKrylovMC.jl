@@ -11,7 +11,7 @@ using ForwardDiff
 include("types.jl")
 include("utils.jl")
 include("random_utils.jl")
-include("solvers/MC.jl"); include("solvers/eigendecomposition.jl"); include("solvers/quadrature.jl")
+include("solvers/MC.jl"); include("solvers/eigendecomposition.jl"); include("solvers/quadrature.jl"); include("solvers/integrator.jl")
 
 export MittagLefflerProblem, FracExpProblem, MittagLefflerRand, FracExpRand, MittagLefflerSolution
 # abstract types to support different kinds of solutions
@@ -23,7 +23,7 @@ export MCSolver
 export MCSolverSaveSamples
 export MCSolverExpokit
 export QuadSolver, QuadKrySolver, ShitSolver
-export EigenSolver
+export EigenSolver, IntegratorSolver
 
 # utils 
 export SpectralKernel, SpectralKernelRNG
